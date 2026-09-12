@@ -11,4 +11,6 @@ BATCH_SIZE = 8
 
 TRAINING_EPOCHS = 100
 
+MODELS_OUTPUT_DIR = Path(__file__).resolve().parent / "models"
+
 

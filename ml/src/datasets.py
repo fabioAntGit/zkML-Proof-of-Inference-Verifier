@@ -16,11 +16,11 @@ class DocumentDataset(Dataset):
         return self.cv_txt[idx], self.job_txt[idx], self.label[idx]
 
 class EmbeddingDataset(Dataset):
-    def __init__(self, embeddings_dir: str | Path = EMBEDDINGS_OUTPUT_DIR):
+    def __init__(self, embeddings_dir: str | Path = EMBEDDINGS_OUTPUT_DIR, device: str | torch.device = "cpu"):
         d = Path(embeddings_dir)
-        self.cv = torch.load(d / "cv_embeddings.pt")
-        self.job = torch.load(d / "job_embeddings.pt")
-        self.label = torch.load(d / "labels.pt")
+        self.cv = torch.load(d / "cv_embeddings.pt", map_location=device)
+        self.job = torch.load(d / "job_embeddings.pt", map_location=device)
+        self.label = torch.load(d / "labels.pt", map_location=device)
 
     def __len__(self):
         return len(self.label)
