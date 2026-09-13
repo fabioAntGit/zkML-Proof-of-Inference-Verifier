@@ -1,13 +1,13 @@
 from src.datasets import EmbeddingDataset
-from config import BATCH_SIZE, TRAINING_EPOCHS, MODELS_OUTPUT_DIR
+from config import BATCH_SIZE, TRAINING_EPOCHS, MODELS_OUTPUT_DIR, ONNX_MODELS_DIR
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, random_split
 from torch.utils.tensorboard import SummaryWriter
 from src.model import CVModelV1
-from src.utils import get_device
+from src.utils import get_device, set_seed, export_to_onnx
 from sklearn.metrics import classification_report, confusion_matrix
-from src.utils import set_seed
+
 
 
 def evaluate(model, test_loader, device):
@@ -104,7 +104,7 @@ def train():
     model.load_state_dict(torch.load(model_path))
     model.to(device)
     evaluate(model, test_loader, device)
-
+    export_to_onnx(model, test_loader[0][0], ONNX_MODELS_DIR, "cv_model_v1.onnx")
 
 if __name__ == "__main__":
     train()

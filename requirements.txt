@@ -2,4 +2,7 @@ torch
 transformers
 sentence-transformers
 pyMuPDF
-
+onnx
+onnxscript
+ezkl
+solc

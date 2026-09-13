@@ -13,4 +13,8 @@ TRAINING_EPOCHS = 100
 
 MODELS_OUTPUT_DIR = Path(__file__).resolve().parent / "models"
 
+ONNX_MODELS_DIR = Path(__file__).resolve().parent / "models" / "onnx"
+
+INPUT_ONNX_DATA_DIR = Path(__file__).resolve().parent / "models" / "onnx" / "data"
+
 
