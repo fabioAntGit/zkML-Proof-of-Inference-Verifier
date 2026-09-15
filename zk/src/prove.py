@@ -1,53 +1,26 @@
 import ezkl
-import json
-import asyncio
+
+from zk.config import (
+    DEFAULT_INPUT_PATH,
+    COMPILED_MODEL_PATH,
+    PK_PATH,
+    VK_PATH,
+    SETTINGS_PATH,
+    WITNESS_PATH,
+    PROOF_PATH,
+)
 
 
-async def main():
-    model_path = "ml/models/onnx/cv_model_v1.onnx"
-    input_path = "ml/models/onnx/data/cv_model_v1/input.json"
-    settings_path = "zk/circuit/settings.json"
-    compiled_path = "zk/circuit/model.compiled"
-    vk_path = "zk/keys/vk.key"
-    pk_path = "zk/keys/pk.key"
-    witness_path = "zk/proofs/witness.json"
-    proof_path = "zk/proofs/proof.json"
-    sol_code_path = "zk/verifier/verifier.sol"
-    abi_path = "zk/verifier/abi.json"
+def prove(
+    input_path: str = str(DEFAULT_INPUT_PATH),
+    proof_path: str = str(PROOF_PATH),
+    witness_path: str = str(WITNESS_PATH),
+):
+    ezkl.gen_witness(str(input_path), str(COMPILED_MODEL_PATH), str(witness_path))
+    ezkl.prove(str(witness_path), str(COMPILED_MODEL_PATH), str(PK_PATH), str(proof_path))
+    assert ezkl.verify(str(proof_path), str(SETTINGS_PATH), str(VK_PATH))
+    print(f"Proof generated and verified successfully at: {proof_path}")
 
-    # ---- config de visibilidade: modelo + input privados, output público ----
-    run_args = ezkl.PyRunArgs()
-    run_args.param_visibility = "fixed" 
-    run_args.input_visibility = "private"
-    run_args.output_visibility = "public"
-
-    res = ezkl.gen_settings(model_path, settings_path, py_run_args=run_args)
-    assert res == True
-
-    res = ezkl.calibrate_settings(input_path, model_path, settings_path, target="accuracy")
-    assert res == True
-
-    res = ezkl.compile_circuit(model_path, compiled_path, settings_path)
-    assert res == True
-
-    res = await ezkl.get_srs(settings_path)
-    assert res == True
-
-    res = ezkl.setup(compiled_path, vk_path, pk_path)
-    assert res == True
-
-    res = ezkl.gen_witness(input_path, compiled_path, witness_path)
-
-    res = ezkl.prove(witness_path, compiled_path, pk_path, proof_path)
-
-    res = ezkl.verify(proof_path, settings_path, vk_path)
-    assert res == True
-    print("Prova gerada e verificada com sucesso!")
-
-    res = await ezkl.create_evm_verifier(vk_path, settings_path, sol_code_path, abi_path)
-    print (res)
-    print ("type :" , type(res))
-    print("Verificador EVM criado com sucesso!")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    prove()

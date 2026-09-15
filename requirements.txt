@@ -1,8 +1,19 @@
+# Core ML
 torch
+numpy
+pandas
+scikit-learn
 transformers
 sentence-transformers
-pyMuPDF
+tensorboard
+
+# ONNX export
 onnx
 onnxscript
+
+# Zero-Knowledge
 ezkl
-solc
+
+# App
+streamlit
+pyMuPDF

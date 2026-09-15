@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "zkml-proof-of-inference-verifier"
+version = "0.1.0"
+description = "zkML pipeline: CV/job embedding model with ezkl proof generation and on-chain verification"
+requires-python = ">=3.10"
+# As dependencias de runtime vivem em requirements.txt (pip install -r requirements.txt).
+# Este pyproject existe para tornar os pacotes `ml` e `zk` importaveis a partir da raiz
+# do projeto, em qualquer working directory (pip install -e .).
+
+[tool.setuptools]
+packages = ["ml", "ml.src", "zk", "zk.src"]

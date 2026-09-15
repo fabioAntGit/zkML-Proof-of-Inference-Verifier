@@ -3,9 +3,10 @@ import random
 import numpy as np
 from torch import nn
 import json
-from config import INPUT_ONNX_DATA_DIR
+from ml.config import INPUT_ONNX_DATA_DIR
 from pathlib import Path
 import onnx
+import pymupdf
 
 
 def get_device() -> torch.device:
@@ -41,9 +42,19 @@ def export_to_onnx(model: nn.Module, dummy_input: torch.Tensor, output_path: Pat
     onnx_model = onnx.load(onnx_path)
     onnx.save_model(onnx_model, onnx_path, save_as_external_data=False)
 
-    data_array = dummy_input.detach().numpy().reshape([-1]).tolist()
+    data_array = dummy_input.flatten().tolist()
     data = dict(input_data=[data_array])
     with open(INPUT_ONNX_DATA_DIR / file_name.split('.')[0] / "input.json", 'w') as f:
         json.dump(data, f)
 
     print(f"Model exported to {onnx_path}")
+
+
+def extract_text_from_pdf(pdf_source: str | Path | bytes) -> str:
+    if isinstance(pdf_source, bytes):
+        doc = pymupdf.open(stream=pdf_source, filetype="pdf")
+    else:
+        doc = pymupdf.open(str(pdf_source))
+
+    text = " ".join(page.get_text() for page in doc)
+    return text.strip()

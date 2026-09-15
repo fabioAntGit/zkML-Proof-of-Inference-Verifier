@@ -1,11 +1,11 @@
-from src.datasets import EmbeddingDataset
-from config import BATCH_SIZE, TRAINING_EPOCHS, MODELS_OUTPUT_DIR, ONNX_MODELS_DIR
+from ml.src.dataset_loader import EmbeddingDataset
+from ml.config import BATCH_SIZE, TRAINING_EPOCHS, MODELS_OUTPUT_DIR, ONNX_MODELS_DIR
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, random_split
 from torch.utils.tensorboard import SummaryWriter
-from src.model import CVModelV1
-from src.utils import get_device, set_seed, export_to_onnx
+from ml.src.model import CVModelV1
+from ml.src.utils import get_device, set_seed, export_to_onnx
 from sklearn.metrics import classification_report, confusion_matrix
 
 
@@ -28,7 +28,7 @@ def evaluate(model, test_loader, device):
 
 
 def train():
-    #set_seed(42)
+    set_seed(42)
     device = get_device()
     dataset = EmbeddingDataset(device=device)
 
@@ -39,7 +39,7 @@ def train():
     train_loader = DataLoader(train_ds, batch_size=BATCH_SIZE, shuffle=True)
     test_loader = DataLoader(test_ds, batch_size=BATCH_SIZE, shuffle=False)
 
-    model = CVModelV1(4096).to(device)
+    model = CVModelV1(2048).to(device)
     loss_fn = nn.BCEWithLogitsLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
 
@@ -104,7 +104,10 @@ def train():
     model.load_state_dict(torch.load(model_path))
     model.to(device)
     evaluate(model, test_loader, device)
-    export_to_onnx(model, test_loader[0][0], ONNX_MODELS_DIR, "cv_model_v1.onnx")
+
+    model = model.cpu()  
+    dummy_input = torch.randn(1, 2048)
+    export_to_onnx(model, dummy_input, ONNX_MODELS_DIR, "cv_model_v1.onnx")
 
 if __name__ == "__main__":
     train()
