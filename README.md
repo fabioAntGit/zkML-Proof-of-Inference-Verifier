@@ -1,4 +1,4 @@
-# zkML - Proof of Inference Verifier
+![Banner do Repositório](assets/attesta_banner.png)
 
 Match CVs against job postings using a machine learning model **and** cryptographically prove that the model ran correctly, without revealing the private data of the applicant.
 
