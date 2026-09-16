@@ -1,4 +1,5 @@
 import json
+import math
 import subprocess
 from pathlib import Path
 import streamlit as st
@@ -101,10 +102,18 @@ if "latest_result" in st.session_state:
             with open(actual_proof_path, "r") as f:
                 proof_data = json.load(f)
             hex_proof = proof_data.get("hex_proof", "")
-            instances = proof_data.get("instances", [])
+            raw_logit = float(proof_data["pretty_public_inputs"]["rescaled_outputs"][0][0])
+            proof_prob = 1 / (1 + math.exp(-raw_logit))
             st.caption(f"Proof file: `{actual_proof_path}`")
-            with st.expander("View ZK Proof Details (Hex Proof / Public Instances)"):
-                st.write("**Public Instances (Score):**", instances)
+            with st.expander("View ZK Proof Details (Hex Proof / Circuit Output)"):
+                st.write(
+                    f"**Circuit Output (from ZK proof):** logit = {raw_logit:.4f} "
+                    f"→ probability = {proof_prob * 100:.2f}%"
+                )
+                st.caption(
+                    "This value is cryptographically bound to the proof above — anyone can verify "
+                    "it matches the model's computation without re-running the model."
+                )
                 st.text_area("Hex Proof (bytes for Smart Contract):", hex_proof[:200] + "...", height=80)
 
     st.divider()
